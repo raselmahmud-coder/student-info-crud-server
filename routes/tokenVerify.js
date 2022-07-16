@@ -12,7 +12,7 @@ const tokenVerify = (req, res, next) => {
           next("authorization failed" + err);
         } else {
           const { name, email } = decoded;
-          console.log(name, email);
+        //   console.log(name, email);
           req.name = name;
           req.email = email;
           next();
