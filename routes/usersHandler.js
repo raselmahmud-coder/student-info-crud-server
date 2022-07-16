@@ -24,14 +24,22 @@ router.post("/registration", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
+  //   console.log(email, password);
   if (email && password) {
-    console.log(email, password);
     try {
       const user = await User.findOne({ email });
       if (Object.values(user).length > 0) {
         const match = await bcrypt.compare(password.toString(), user.password);
         if (match) {
-          res.status(200).send(user);
+          // generate a token
+          const token = jsonwebtoken.sign(
+            { email, name: user.name },
+            process.env.LOGIN_SECRET,
+            {
+              expiresIn: "1d",
+            }
+          );
+          res.status(200).send({ token: token });
         } else {
           res.status(404).send({ message: "sorry, we can't find" });
         }
@@ -39,7 +47,7 @@ router.post("/login", async (req, res) => {
         res.status(404).send({ message: "sorry, we can't find" });
       }
     } catch (error) {
-      res.status(500).send({ message: "sorry! can't add this request" });
+      res.status(500).send({ message: "sorry! request failed" });
     }
   } else {
     res.status(500).send({ message: "please provide valid information" });

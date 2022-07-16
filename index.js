@@ -36,4 +36,13 @@ mongoose.connect(
   }
 );
 app.use("/student", studentHandler);
-app.use("/student", userHandler);
+app.use("/user", userHandler);
+// error handling fn
+function errorHandler(err, req, res, next) {
+  if (res.headersSent) {
+    return next(err);
+  } else {
+    res.status(500).json({ error: err });
+  }
+}
+app.use(errorHandler);

@@ -1,12 +1,11 @@
 const express = require("express");
-// const bcrypt = require("bcrypt");
-// const jsonwebtoken = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const studentSchema = require("../schemas/studentSchema");
+const tokenVerify = require("./tokenVerify");
 const router = express.Router();
 const Student = mongoose.model("Student", studentSchema);
 
-router.post("/", async (req, res) => {
+router.post("/", tokenVerify, async (req, res) => {
   const { name, degree, university, regNo, phone } = req.body;
   // console.log(name, degree, university, regNo, phone );
   if ((name && degree, university && regNo && +phone.length === 11)) {
@@ -26,7 +25,7 @@ router.post("/", async (req, res) => {
 });
 
 // update request by id
-router.put("/:id", async (req, res) => {
+router.put("/:id", tokenVerify, async (req, res) => {
   const { id } = req.params;
   let update = {};
   for (const key in req.body) {
@@ -34,8 +33,6 @@ router.put("/:id", async (req, res) => {
       update[key] = req.body[key];
     }
   }
-  // console.log("hello", update);
-
   if (Object.values(update).length > 0) {
     try {
       const result = await Student.findByIdAndUpdate({ _id: id }, update, {
@@ -53,7 +50,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // read all students
-router.get("/", async (req, res) => {
+router.get("/", tokenVerify, async (req, res) => {
   try {
     const result = await Student.find({});
     res.status(200).send(result);
@@ -63,7 +60,7 @@ router.get("/", async (req, res) => {
   }
 });
 // delete student by id
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", tokenVerify, async (req, res) => {
   const { id } = req.params;
   if (id) {
     try {
@@ -77,7 +74,5 @@ router.delete("/:id", async (req, res) => {
     res.status(404).send("please give an id");
   }
 });
-
-
 
 module.exports = router;
