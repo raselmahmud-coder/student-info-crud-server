@@ -8,11 +8,14 @@ const Student = mongoose.model("Student", studentSchema);
 
 router.post("/", async (req, res) => {
   const { name, degree, university, regNo, phone } = req.body;
+  // console.log(name, degree, university, regNo, phone );
   if ((name && degree, university && regNo && +phone.length === 11)) {
     try {
       const student = new Student({ ...req.body });
-      await student.save();
-      res.status(200).send("successfully save your record");
+      const result = await student.save();
+      res
+        .status(200)
+        .send({ message: "successfully save your record", data: result });
     } catch (error) {
       //   console.log("error occurred", error);
       res.status(500).send("record save was failed");
@@ -23,15 +26,21 @@ router.post("/", async (req, res) => {
 });
 
 // update request by id
-router.put("/", async (req, res) => {
-  const { id, name, degree, university, regNo, phone } = req.body;
-  if ((id || name || degree, university || regNo || phone)) {
+router.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  let update = {};
+  for (const key in req.body) {
+    if (req.body[key]) {
+      update[key] = req.body[key];
+    }
+  }
+  // console.log("hello", update);
+
+  if (Object.values(update).length > 0) {
     try {
-      const result = await Student.findOneAndUpdate(
-        { _id: id },
-        { $set: { name, degree, university, regNo, phone } },
-        { new: true }
-      );
+      const result = await Student.findByIdAndUpdate({ _id: id }, update, {
+        new: true,
+      });
 
       res.status(200).send(result);
     } catch (error) {
@@ -68,5 +77,7 @@ router.delete("/:id", async (req, res) => {
     res.status(404).send("please give an id");
   }
 });
+
+
 
 module.exports = router;

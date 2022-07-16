@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const studentHandler = require("./routes/studentHandler");
+const userHandler = require("./routes/usersHandler");
 const port = process.env.PORT || 4000;
 const app = express();
 
@@ -35,3 +36,4 @@ mongoose.connect(
   }
 );
 app.use("/student", studentHandler);
+app.use("/student", userHandler);
